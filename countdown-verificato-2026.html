@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Per te, Lu</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:#fdf5f0;
+  font-family:Georgia,serif;
+  color:#4e3030;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:24px;
+}
+.card{
+  width:100%;
+  max-width:460px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(228,152,152,.35);
+  border-radius:28px;
+  padding:34px 24px;
+  text-align:center;
+  box-shadow:0 10px 45px rgba(184,92,92,.10);
+}
+h1{
+  font-size:52px;
+  font-weight:300;
+  color:#b85c5c;
+  margin:8px 0 18px;
+}
+.small{
+  color:#9e6868;
+  letter-spacing:.16em;
+  font-size:14px;
+}
+.subtitle{
+  font-size:22px;
+  color:#b85c5c;
+  margin-bottom:24px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin:24px 0;
+}
+.value{
+  font-size:36px;
+  color:#b85c5c;
+  line-height:1;
+}
+.label{
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:#e49898;
+  margin-top:6px;
+}
+.date{
+  font-family:Arial,sans-serif;
+  color:#9e6868;
+  font-size:14px;
+  margin:18px 0 22px;
+  line-height:1.5;
+}
+button{
+  border:1px solid rgba(184,92,92,.30);
+  border-radius:999px;
+  background:#fff7f7;
+  color:#9e6868;
+  padding:12px 18px;
+  font-size:13px;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+button:active{transform:scale(.98)}
+.arrived{
+  display:none;
+  font-size:30px;
+  font-style:italic;
+  color:#b85c5c;
+  margin:28px 0;
+}
+.modalOverlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(60,25,25,.45);
+  z-index:10;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.modalOverlay.open{display:flex}
+.modal{
+  width:100%;
+  max-width:330px;
+  background:white;
+  border-radius:24px;
+  padding:24px;
+  box-shadow:0 28px 70px rgba(184,92,92,.22);
+}
+.modal h2{
+  font-size:24px;
+  color:#b85c5c;
+  margin-bottom:18px;
+  font-weight:300;
+}
+.field{
+  text-align:left;
+  margin-bottom:14px;
+  font-family:Arial,sans-serif;
+}
+.field label{
+  display:block;
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#9e6868;
+  margin-bottom:6px;
+}
+.field input{
+  width:100%;
+  border:1px solid rgba(228,152,152,.55);
+  border-radius:12px;
+  padding:12px;
+  font-size:16px;
+}
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+.actions button{
+  flex:1;
+  letter-spacing:0;
+  text-transform:none;
+}
+.save{
+  background:#b85c5c;
+  color:white;
+}
+.error{
+  color:#b85c5c;
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  margin-top:12px;
+  min-height:18px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="small">per te,</div>
+  <h1>Lu</h1>
+  <div class="subtitle" id="subtitle">non vedo l'ora di abbracciarti 🌸</div>
+
+  <div class="grid" id="countdownGrid">
+    <div><div class="value" id="days">00</div><div class="label">giorni</div></div>
+    <div><div class="value" id="hours">00</div><div class="label">ore</div></div>
+    <div><div class="value" id="minutes">00</div><div class="label">minuti</div></div>
+    <div><div class="value" id="seconds">00</div><div class="label">secondi</div></div>
+  </div>
+
+  <div class="arrived" id="arrived">🌸 finalmente ci sei 🌸</div>
+
+  <div class="date" id="dateText">caricamento...</div>
+
+  <button type="button" id="changeBtn">✎ cambia data</button>
+</div>
+
+<div class="modalOverlay" id="modalOverlay">
+  <div class="modal">
+    <h2>🌸 Quando ci vediamo?</h2>
+
+    <div class="field">
+      <label for="inputDate">Data</label>
+      <input id="inputDate" type="date">
+    </div>
+
+    <div class="field">
+      <label for="inputTime">Ora</label>
+      <input id="inputTime" type="time" value="21:00">
+    </div>
+
+    <div class="actions">
+      <button type="button" id="cancelBtn">Annulla</button>
+      <button type="button" class="save" id="saveBtn">Salva</button>
+    </div>
+
+    <div class="error" id="errorBox"></div>
+  </div>
+</div>
+
+<script>
+const FIREBASE_URL = "https://countdown-lu-default-rtdb.firebaseio.com/targetDate.json";
+
+// 13 maggio 2026, ore 21:00 italiane.
+// In UTC è 19:00 perché a maggio in Italia siamo UTC+2.
+const DEFAULT_ISO = "2026-05-13T19:00:00.000Z";
+
+let targetDate = new Date(DEFAULT_ISO);
+let timer = null;
+
+const el = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,"0");
+
+function isoForItalianDate(dateValue, timeValue){
+  // Converte "2026-05-13" + "21:00" ora italiana estiva in ISO UTC corretto.
+  // Per questa pagina basta usare Europe/Rome; maggio = UTC+2.
+  const [y,m,d] = dateValue.split("-").map(Number);
+  const [hh,mm] = timeValue.split(":").map(Number);
+  const utcMillis = Date.UTC(y, m - 1, d, hh - 2, mm, 0, 0);
+  return new Date(utcMillis).toISOString();
+}
+
+function italianDateInputFromTarget(date){
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone:"Europe/Rome",
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit"
+  }).formatToParts(date);
+  const obj = {};
+  parts.forEach(p => obj[p.type] = p.value);
+  return `${obj.year}-${obj.month}-${obj.day}`;
+}
+
+function italianTimeInputFromTarget(date){
+  const parts = new Intl.DateTimeFormat("it-IT", {
+    timeZone:"Europe/Rome",
+    hour:"2-digit",
+    minute:"2-digit",
+    hour12:false
+  }).formatToParts(date);
+  const obj = {};
+  parts.forEach(p => obj[p.type] = p.value);
+  return `${obj.hour}:${obj.minute}`;
+}
+
+async function saveToFirebase(date){
+  const res = await fetch(FIREBASE_URL, {
+    method:"PUT",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(date.toISOString())
+  });
+
+  if(!res.ok){
+    throw new Error("Firebase non ha accettato il salvataggio. Controlla le regole .write.");
+  }
+
+  localStorage.setItem("countdown_target_v4", date.toISOString());
+}
+
+async function loadDate(){
+  try{
+    const res = await fetch(FIREBASE_URL);
+    const data = await res.json();
+
+    if(data){
+      targetDate = new Date(data);
+
+      // Se nel database c'è ancora una data già passata, la corregge automaticamente al 2026.
+      if(targetDate.getTime() < Date.now()){
+        targetDate = new Date(DEFAULT_ISO);
+        await saveToFirebase(targetDate);
+      }
+    }else{
+      targetDate = new Date(DEFAULT_ISO);
+      await saveToFirebase(targetDate);
+    }
+  }catch(e){
+    const saved = localStorage.getItem("countdown_target_v4");
+    targetDate = saved ? new Date(saved) : new Date(DEFAULT_ISO);
+  }
+
+  renderDate();
+  updateCountdown();
+
+  if(timer) clearInterval(timer);
+  timer = setInterval(updateCountdown, 1000);
+}
+
+function renderDate(){
+  el("dateText").textContent = targetDate.toLocaleString("it-IT", {
+    timeZone:"Europe/Rome",
+    weekday:"long",
+    day:"numeric",
+    month:"long",
+    year:"numeric",
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+}
+
+function updateCountdown(){
+  const diff = targetDate.getTime() - Date.now();
+
+  if(diff <= 0){
+    el("countdownGrid").style.display = "none";
+    el("arrived").style.display = "block";
+    el("subtitle").textContent = "eccoti qui, finalmente";
+    return;
+  }
+
+  el("countdownGrid").style.display = "grid";
+  el("arrived").style.display = "none";
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+
+  el("days").textContent = pad(days);
+  el("hours").textContent = pad(hours);
+  el("minutes").textContent = pad(minutes);
+  el("seconds").textContent = pad(seconds);
+
+  if(days === 0) el("subtitle").textContent = "oggi ci vediamo 🌸";
+  else if(days === 1) el("subtitle").textContent = "domani ti stringo forte";
+  else el("subtitle").textContent = "non vedo l'ora di abbracciarti 🌸";
+}
+
+function openModal(){
+  el("errorBox").textContent = "";
+  el("inputDate").value = italianDateInputFromTarget(targetDate);
+  el("inputTime").value = italianTimeInputFromTarget(targetDate);
+  el("modalOverlay").classList.add("open");
+}
+
+function closeModal(){
+  el("modalOverlay").classList.remove("open");
+}
+
+async function handleSave(){
+  const dateValue = el("inputDate").value;
+  const timeValue = el("inputTime").value || "21:00";
+
+  if(!dateValue){
+    el("errorBox").textContent = "Scegli una data.";
+    return;
+  }
+
+  const iso = isoForItalianDate(dateValue, timeValue);
+  const newDate = new Date(iso);
+
+  if(newDate.getTime() <= Date.now()){
+    el("errorBox").textContent = "Scegli una data futura.";
+    return;
+  }
+
+  try{
+    targetDate = newDate;
+    await saveToFirebase(targetDate);
+    renderDate();
+    updateCountdown();
+    closeModal();
+  }catch(e){
+    el("errorBox").textContent = e.message || "Errore nel salvataggio.";
+  }
+}
+
+el("changeBtn").addEventListener("click", openModal);
+el("cancelBtn").addEventListener("click", closeModal);
+el("saveBtn").addEventListener("click", handleSave);
+el("modalOverlay").addEventListener("click", function(e){
+  if(e.target === el("modalOverlay")) closeModal();
+});
+
+loadDate();
+</script>
+
+</body>
+</html>
