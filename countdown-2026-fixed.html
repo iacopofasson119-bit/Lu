@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown</title>
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#fff7f7;
+  font-family:Georgia,serif;
+  color:#b45c6c;
+}
+
+.card{
+  background:white;
+  padding:40px;
+  border-radius:30px;
+  width:90%;
+  max-width:420px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+#countdown{
+  font-size:40px;
+  margin:20px 0;
+}
+
+button{
+  border:none;
+  background:#f4cdd4;
+  color:#8b4b57;
+  padding:12px 20px;
+  border-radius:999px;
+  cursor:pointer;
+  margin-top:20px;
+}
+
+input{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <h1>Per te, Lu 🌸</h1>
+
+  <p id="subtitle">non vedo l'ora di abbracciarti</p>
+
+  <div id="countdown">-- : -- : --</div>
+
+  <p id="dateText"></p>
+
+  <button onclick="changeDate()">✎ cambia data</button>
+
+</div>
+
+<script>
+
+const FIREBASE_URL = "https://countdown-lu-default-rtdb.firebaseio.com/targetDate.json";
+
+let targetDate;
+
+// DATA DEFAULT CORRETTA → 13 MAGGIO 2026 ORE 21:00 ITALIA
+const defaultDate = new Date(2026,4,13,21,0,0);
+
+async function loadDate(){
+
+  try{
+
+    const response = await fetch(FIREBASE_URL);
+    const data = await response.json();
+
+    if(data){
+      targetDate = new Date(data);
+    }else{
+      targetDate = defaultDate;
+      await saveDate(targetDate);
+    }
+
+  }catch(e){
+
+    targetDate = defaultDate;
+
+  }
+
+  renderDate();
+  updateCountdown();
+
+}
+
+async function saveDate(date){
+
+  await fetch(FIREBASE_URL,{
+    method:"PUT",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify(date.toISOString())
+  });
+
+}
+
+function renderDate(){
+
+  document.getElementById("dateText").innerText =
+    targetDate.toLocaleString("it-IT",{
+      weekday:"long",
+      day:"numeric",
+      month:"long",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit",
+      timeZone:"Europe/Rome"
+    });
+
+}
+
+function updateCountdown(){
+
+  const now = new Date();
+
+  const diff = targetDate - now;
+
+  if(diff <= 0){
+
+    document.getElementById("countdown").innerHTML =
+      "🌸 finalmente ci sei 🌸";
+
+    return;
+  }
+
+  const days = Math.floor(diff / 1000 / 60 / 60 / 24);
+
+  const hours = Math.floor((diff / 1000 / 60 / 60) % 24);
+
+  const minutes = Math.floor((diff / 1000 / 60) % 60);
+
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  document.getElementById("countdown").innerHTML =
+    `${days}g ${hours}h ${minutes}m ${seconds}s`;
+
+}
+
+async function changeDate(){
+
+  const input = prompt(
+    "Inserisci nuova data formato:\n2026-05-13 21:00"
+  );
+
+  if(!input) return;
+
+  const parsed = new Date(input.replace(" ","T"));
+
+  if(isNaN(parsed)){
+
+    alert("Data non valida");
+    return;
+  }
+
+  targetDate = parsed;
+
+  await saveDate(parsed);
+
+  renderDate();
+  updateCountdown();
+
+}
+
+loadDate();
+
+setInterval(updateCountdown,1000);
+
+</script>
+
+</body>
+</html>
