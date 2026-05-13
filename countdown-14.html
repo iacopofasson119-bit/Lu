@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Per te, Lu</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F338;</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blush:#f5d0cb;--rose:#e49898;--deep:#b85c5c;--cream:#fdf5f0;--text:#4e3030;--soft:#9e6868}
+body{min-height:100vh;background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-x:hidden;position:relative;transition:background 1.4s,color 1.4s}
+body.night{background:#160d0d;color:#f0dada;--deep:#e8b0b0;--rose:#c47878;--soft:#c49090;--text:#f0dada}
+.bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.petal{position:absolute;opacity:0;animation:floatPetal linear infinite;user-select:none}
+@keyframes floatPetal{0%{transform:translateY(-80px) rotate(0deg);opacity:0}8%{opacity:.2}88%{opacity:.16}100%{transform:translateY(110vh) rotate(400deg);opacity:0}}
+.star{position:absolute;background:#f5d0cb;border-radius:50%;opacity:0;animation:twinkle ease-in-out infinite;display:none}
+body.night .star{display:block}
+body.night .petal{display:none}
+@keyframes twinkle{0%,100%{opacity:.05;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+.wrapper{position:relative;z-index:1;width:100%;max-width:460px;padding:2.5rem 1.4rem 4rem;display:flex;flex-direction:column;align-items:center;gap:1.2rem}
+.header{display:flex;flex-direction:column;align-items:center;gap:.2rem;animation:fadeDown .9s ease both}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+.name-label{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(.82rem,2.8vw,.95rem);color:var(--soft);letter-spacing:.22em;opacity:.85}
+.main-name{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,12vw,4.5rem);font-weight:300;color:var(--deep);line-height:1;letter-spacing:.04em;transition:color 1.4s}
+.ornament-row{font-size:1rem;opacity:.6;margin-top:.3rem;letter-spacing:.25rem}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.card{width:100%;background:rgba(255,255,255,.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1.5px solid rgba(228,152,152,.3);border-radius:28px;padding:1.8rem 1.6rem 2rem;box-shadow:0 10px 45px rgba(184,92,92,.09),inset 0 1px 0 rgba(255,255,255,.8);display:flex;flex-direction:column;align-items:center;gap:1.2rem;transition:background 1.4s,border 1.4s;animation:fadeUp .9s .25s ease both}
+body.night .card{background:rgba(35,15,15,.7);border-color:rgba(228,152,152,.18)}
+.card-label{font-family:'Cormorant Garamond',serif;font-size:clamp(1.1rem,4.2vw,1.42rem);font-weight:300;color:var(--deep);text-align:center;line-height:1.45;transition:color 1.4s;min-height:1.8em}
+.countdown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;width:100%}
+.unit{display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.unit-value{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,11vw,4rem);font-weight:300;color:var(--deep);line-height:1;text-align:center;transition:transform .18s cubic-bezier(.34,1.56,.64,1),color 1.4s}
+.unit-value.tick{transform:scale(1.12)}
+.unit-label{font-size:clamp(.55rem,1.7vw,.65rem);letter-spacing:.15em;text-transform:uppercase;color:var(--rose)}
+.unit-bar-wrap{width:80%;height:2px;background:rgba(228,152,152,.15);border-radius:2px;margin-top:.1rem;overflow:hidden}
+.unit-bar{height:100%;background:linear-gradient(90deg,var(--rose),var(--deep));border-radius:2px;transition:width .9s ease}
+.divider{display:flex;align-items:center;gap:.5rem;width:100%}
+.divider-line{flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(228,152,152,.32),transparent)}
+.divider-icon{font-size:.8rem;opacity:.6}
+.target-date{font-size:.72rem;color:var(--soft);letter-spacing:.08em;text-align:center;opacity:.82}
+.message-arrive{display:none;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.3rem,5.5vw,1.85rem);color:var(--deep);text-align:center;animation:pulse 2.5s ease-in-out infinite;padding:.5rem 0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.spotify-card{width:100%;background:rgba(255,255,255,.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1.5px solid rgba(228,152,152,.3);border-radius:28px;padding:1.6rem 1.6rem 1.8rem;box-shadow:0 10px 45px rgba(184,92,92,.09);display:flex;flex-direction:column;align-items:center;gap:1.1rem;transition:background 1.4s,border 1.4s;animation:fadeUp .9s .35s ease both}
+body.night .spotify-card{background:rgba(35,15,15,.7);border-color:rgba(228,152,152,.18)}
+.spotify-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1rem,3.8vw,1.28rem);font-weight:300;color:var(--deep);text-align:center;transition:color 1.4s}
+.bottom-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(.88rem,3vw,1rem);color:var(--soft);text-align:center;opacity:.7;line-height:1.7;padding:0 .5rem;animation:fadeUp .9s .45s ease both}
+.night-toggle{position:fixed;top:1rem;right:1rem;z-index:50;background:rgba(255,255,255,.55);backdrop-filter:blur(10px);border:1px solid rgba(228,152,152,.25);border-radius:50px;padding:.38rem .82rem;font-size:.72rem;letter-spacing:.1em;color:var(--soft);cursor:pointer;transition:all .3s;font-family:'Jost',sans-serif}
+body.night .night-toggle{background:rgba(35,15,15,.7);border-color:rgba(228,152,152,.2);color:#c49090}
+/* Secret overlay */
+.secret-overlay{display:none;position:fixed;inset:0;background:rgba(12,3,3,.94);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;padding:2rem}
+.secret-overlay.open{display:flex}
+.secret-box{max-width:330px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.5rem;animation:secretIn .85s cubic-bezier(.34,1.56,.64,1)}
+@keyframes secretIn{from{opacity:0;transform:scale(.72) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.secret-petals{font-size:2.2rem;letter-spacing:.35rem;animation:breathe 3.5s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.secret-eyebrow{font-family:'Jost',sans-serif;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--rose);opacity:.75}
+.secret-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.4rem,5.8vw,1.9rem);font-weight:300;color:#fdf0f0;line-height:1.7}
+.secret-close{background:none;border:1px solid rgba(228,152,152,.35);border-radius:50px;padding:.5rem 1.5rem;font-family:'Jost',sans-serif;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:#e49898;cursor:pointer;transition:all .2s;margin-top:.5rem}
+.secret-close:hover{background:rgba(228,152,152,.1)}
+.edit-btn{background:none;border:1px solid rgba(184,92,92,.28);border-radius:50px;padding:.46rem 1.25rem;font-family:'Jost',sans-serif;font-size:.67rem;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);cursor:pointer;transition:all .22s ease}
+.edit-btn:hover,.edit-btn:active{background:rgba(228,152,152,.1);border-color:var(--rose);color:var(--deep);transform:translateY(-1px)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(60,25,25,.42);backdrop-filter:blur(8px);z-index:100;align-items:center;justify-content:center;padding:1.5rem}
+.modal-overlay.open{display:flex}
+.modal{background:white;border-radius:26px;padding:2rem 1.8rem;width:100%;max-width:300px;box-shadow:0 28px 70px rgba(184,92,92,.2);display:flex;flex-direction:column;gap:1rem;animation:modalIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.84) translateY(26px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:#b85c5c;text-align:center}
+.field-group{display:flex;flex-direction:column;gap:.35rem}
+.field-group label{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#9e6868}
+.field-group input{border:1.5px solid rgba(228,152,152,.45);border-radius:12px;padding:.65rem 1rem;font-family:'Jost',sans-serif;font-size:1rem;color:#4e3030;outline:none;transition:border-color .2s;background:#fceef0;width:100%}
+.field-group input:focus{border-color:#b85c5c}
+.modal-actions{display:flex;gap:.7rem}
+.btn-cancel{flex:1;padding:.7rem;border:1.5px solid rgba(228,152,152,.38);border-radius:12px;background:none;font-family:'Jost',sans-serif;font-size:.78rem;color:#9e6868;cursor:pointer}
+.btn-save{flex:2;padding:.7rem;border:none;border-radius:12px;background:linear-gradient(135deg,#e49898,#b85c5c);font-family:'Jost',sans-serif;font-size:.78rem;color:white;cursor:pointer;box-shadow:0 4px 14px rgba(184,92,92,.28)}
+</style>
+</head>
+<body>
+
+<div class="bg-layer" id="bgLayer"></div>
+<button class="night-toggle" id="nightToggle" onclick="toggleNight()">&#x1F319; notte</button>
+
+<!-- Secret overlay al countdown zero -->
+<div class="secret-overlay" id="secretOverlay">
+  <div class="secret-box">
+    <div class="secret-petals">&#x1F338; &#x1F337; &#x1F338;</div>
+    <p class="secret-eyebrow">solo per te, Lu</p>
+    <p class="secret-text">finalmente ci sei,<br>&#xe8; il momento che aspettavo.</p>
+    <button class="secret-close" onclick="closeSecret()">chiudi</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>&#x1F338; quando ci vediamo?</h2>
+    <div class="field-group">
+      <label>Data</label>
+      <input type="date" id="inputDate">
+    </div>
+    <div class="field-group">
+      <label>Ora</label>
+      <input type="time" id="inputTime" value="21:00">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">annulla</button>
+      <button class="btn-save" onclick="saveDate()">salva &#x1F338;</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="wrapper">
+  <div class="header">
+    <span class="name-label">per te,</span>
+    <h1 class="main-name" id="mainName">Lu</h1>
+    <div class="ornament-row">&#x1F338; &#x1F337; &#x1F338;</div>
+  </div>
+
+  <div class="card">
+    <p class="card-label" id="cardLabel">non vedo l&#x27;ora di abbracciarti</p>
+    <div class="countdown-grid" id="countdownGrid">
+      <div class="unit">
+        <span class="unit-value" id="days">00</span>
+        <span class="unit-label">giorni</span>
+        <div class="unit-bar-wrap"><div class="unit-bar" id="barDays" style="width:100%"></div></div>
+      </div>
+      <div class="unit">
+        <span class="unit-value" id="hours">00</span>
+        <span class="unit-label">ore</span>
+        <div class="unit-bar-wrap"><div class="unit-bar" id="barHours" style="width:100%"></div></div>
+      </div>
+      <div class="unit">
+        <span class="unit-value" id="minutes">00</span>
+        <span class="unit-label">minuti</span>
+        <div class="unit-bar-wrap"><div class="unit-bar" id="barMinutes" style="width:100%"></div></div>
+      </div>
+      <div class="unit">
+        <span class="unit-value" id="seconds">00</span>
+        <span class="unit-label">secondi</span>
+        <div class="unit-bar-wrap"><div class="unit-bar" id="barSeconds" style="width:100%"></div></div>
+      </div>
+    </div>
+    <div class="message-arrive" id="messageArrive">&#x1F338; finalmente ci sei &#x1F338;</div>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-icon">&#x1F337;</span>
+      <div class="divider-line"></div>
+    </div>
+    <p class="target-date" id="targetDisplay">&#x2014;</p>
+    <button class="edit-btn" id="editBtn" onclick="openModal()">&#x270E; cambia data</button>
+  </div>
+
+  <div class="spotify-card">
+    <p class="spotify-title">&#x1F3B5; la nostra musica</p>
+    <iframe
+      src="https://open.spotify.com/embed/playlist/37i9dQZF1EJDsyGD05ZQOk?utm_source=generator&theme=0"
+      width="100%" height="352" frameborder="0"
+      allowfullscreen=""
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      loading="lazy"
+      style="border-radius:16px;"></iframe>
+  </div>
+
+  <p class="bottom-quote">&#x201C;ogni secondo che passa<br>&#xe8; un secondo pi&#xf9; vicino a te&#x201D;</p>
+</div>
+
+<script>
+// Sfondo
+const bgLayer = document.getElementById('bgLayer');
+const petals = ['\u{1F338}','\u{1F33A}','\u{1F337}','\u{1F33C}','\u{1FAB7}'];
+for(let i=0;i<20;i++){const p=document.createElement('span');p.className='petal';p.textContent=petals[i%petals.length];p.style.cssText=`left:${Math.random()*100}vw;font-size:${0.9+Math.random()*1.4}rem;animation-duration:${14+Math.random()*20}s;animation-delay:${-Math.random()*28}s;`;bgLayer.appendChild(p)}
+for(let i=0;i<55;i++){const s=document.createElement('div');s.className='star';const sz=1.5+Math.random()*2.5;s.style.cssText=`left:${Math.random()*100}vw;top:${Math.random()*100}vh;width:${sz}px;height:${sz}px;animation-duration:${2+Math.random()*4}s;animation-delay:${-Math.random()*5}s;`;bgLayer.appendChild(s)}
+
+// Notte
+function isNightTime(){const h=new Date().getHours();return h>=21||h<7}
+function applyNight(on){document.body.classList.toggle('night',on);document.getElementById('nightToggle').textContent=on?'\u2600\uFE0F giorno':'\u{1F319} notte';localStorage.setItem('nightMode',on?'1':'0')}
+function toggleNight(){applyNight(!document.body.classList.contains('night'))}
+
+// Firebase
+const FB_URL='https://countdown-lu-default-rtdb.europe-west1.firebasedatabase.app/targetDate.json';
+let targetDate=null,secretShown=false;
+
+async function loadDate(){
+  const DEFAULT=new Date('2026-05-13T21:00:00+02:00');
+  try{
+    const res=await fetch(FB_URL);
+    const data=await res.json();
+    if(data){
+      const parsed=new Date(data);
+      if(!isNaN(parsed.getTime())){targetDate=parsed}
+      else{targetDate=DEFAULT;await saveToFirebase(targetDate)}
+    } else{targetDate=DEFAULT;await saveToFirebase(targetDate)}
+  }catch(e){
+    const saved=localStorage.getItem('countdown_target_v3');
+    if(saved){const p=new Date(saved);targetDate=(!isNaN(p.getTime()))?p:DEFAULT;}
+    else{targetDate=DEFAULT;}
+  }
+  updateTargetDisplay();updateCountdown();
+}
+
+async function saveToFirebase(date){
+  try{
+    await fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(date.toISOString())});
+    localStorage.setItem('countdown_target_v3',date.toISOString());
+  }catch(e){
+    localStorage.setItem('countdown_target_v3',date.toISOString());
+  }
+}
+
+function updateTargetDisplay(){
+  if(!targetDate)return;
+  document.getElementById('targetDisplay').textContent=targetDate.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})
+}
+
+function pad(n){return String(n).padStart(2,'0')}
+
+function tickEl(id,val){const el=document.getElementById(id);if(el.textContent!==val){el.textContent=val;el.classList.remove('tick');void el.offsetWidth;el.classList.add('tick');setTimeout(()=>el.classList.remove('tick'),200)}}
+
+function updateCountdown(){
+  if(!targetDate)return;
+  const diff=targetDate-new Date();
+  const grid=document.getElementById('countdownGrid');
+  const msg=document.getElementById('messageArrive');
+  const label=document.getElementById('cardLabel');
+  if(diff<=0){
+    grid.style.display='none';msg.style.display='block';
+    label.textContent='\u{1F338} eccoti qui, finalmente';
+    if(!secretShown){secretShown=true;setTimeout(()=>document.getElementById('secretOverlay').classList.add('open'),1200)}
+    return
+  }
+  grid.style.display='grid';msg.style.display='none';
+  const days=Math.floor(diff/86400000);
+  const hours=Math.floor((diff%86400000)/3600000);
+  const minutes=Math.floor((diff%3600000)/60000);
+  const seconds=Math.floor((diff%60000)/1000);
+  tickEl('days',pad(days));tickEl('hours',pad(hours));tickEl('minutes',pad(minutes));tickEl('seconds',pad(seconds));
+  document.getElementById('barHours').style.width=(hours/23*100)+'%';
+  document.getElementById('barMinutes').style.width=(minutes/59*100)+'%';
+  document.getElementById('barSeconds').style.width=(seconds/59*100)+'%';
+  document.getElementById('barDays').style.width=(Math.min(days,7)/7*100)+'%';
+  if(days===0&&hours===0&&minutes<10)label.textContent='ancora pochi minuti\u2026 \u{1F338}';
+  else if(days===0&&hours<3)label.textContent='ci siamo quasi \u{1F337}';
+  else if(days===0)label.textContent='oggi ci vediamo \u{1F338}';
+  else if(days===1)label.textContent='domani ti stringo forte';
+  else label.textContent="non vedo l'ora di abbracciarti"
+}
+
+// Secret
+function closeSecret(){document.getElementById('secretOverlay').classList.remove('open')}
+
+function openModal(){
+  if(targetDate){
+    const y=targetDate.getFullYear();
+    const mo=String(targetDate.getMonth()+1).padStart(2,'0');
+    const d=String(targetDate.getDate()).padStart(2,'0');
+    document.getElementById('inputDate').value=`${y}-${mo}-${d}`;
+    document.getElementById('inputTime').value=pad(targetDate.getHours())+':'+pad(targetDate.getMinutes());
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
+async function saveDate(){
+  const dv=document.getElementById('inputDate').value;
+  const tv=document.getElementById('inputTime').value||'21:00';
+  if(!dv)return;
+  const[y,m,d]=dv.split('-').map(Number);
+  const[h,min]=tv.split(':').map(Number);
+  targetDate=new Date(y,m-1,d,h,min,0,0);
+  secretShown=false;
+  await saveToFirebase(targetDate);
+  updateTargetDisplay();updateCountdown();
+  closeModal();
+}
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+
+// Init
+const savedNight=localStorage.getItem('nightMode');
+applyNight(savedNight!==null?savedNight==='1':isNightTime());
+loadDate().then(()=>setInterval(updateCountdown,1000));
+</script>
+</body>
+</html>
